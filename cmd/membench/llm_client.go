@@ -13,6 +13,18 @@ import (
 )
 
 // LLMClient wraps an OpenAI-compatible chat completion endpoint.
+//
+// When targeting the OpenCode Zen provider (https://opencode.ai), use one of
+// the following supported model names via --model / MEMBENCH_MODEL:
+//
+//	"DeepSeek V4 Flash"  – fast, cost-effective (default)
+//	"DeepSeek V4 Pro"    – higher-capability DeepSeek model
+//	"Claude Sonnet 4.5"  – Anthropic Claude Sonnet
+//	"GPT 5.4"            – OpenAI GPT
+//	"Gemini 3.5 Flash"   – Google Gemini Flash
+//
+// Note: legacy names such as "deepseek-v4-flash-free" are NOT supported and
+// will result in a 401 ModelError from the provider.
 type LLMClient struct {
 	BaseURL    string
 	Model      string
