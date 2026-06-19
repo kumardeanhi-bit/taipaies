@@ -23,7 +23,8 @@ var downloadFiles = []downloadItem{
 	{Filename: "taipaies-launcher-windows-amd64.exe", Label: "Windows (x86_64)", OS: "windows", Arch: "amd64", Type: "launcher"},
 	{Filename: "taipaies-launcher-darwin-arm64", Label: "macOS Apple Silicon (M1/M2/M3)", OS: "darwin", Arch: "arm64", Type: "launcher"},
 	{Filename: "taipaies-launcher-darwin-amd64", Label: "macOS Intel", OS: "darwin", Arch: "amd64", Type: "launcher"},
-	{Filename: "taipaies-android-universal.apk", Label: "Android APK", OS: "android", Arch: "universal", Type: "apk"},
+	{Filename: "taipaies-android-universal.apk", Label: "Android APK", OS: "android", Arch: "universal", Type: "apk",
+		ExternalURL: "https://github.com/kumardeanhi-bit/taipaies/releases/latest/download/taipaies-android-universal.apk"},
 }
 
 func (h *Handler) registerDownloadRoutes(mux *http.ServeMux) {

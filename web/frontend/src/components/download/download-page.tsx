@@ -33,6 +33,15 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function osIcon(os: string): string {
+  switch (os) {
+    case "windows": return "🪟"
+    case "darwin": return "🍎"
+    case "android": return "📱"
+    default: return "💻"
+  }
+}
+
 export function DownloadPage() {
   const [downloads, setDownloads] = useState<DownloadItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -55,34 +64,19 @@ export function DownloadPage() {
     fetchDownloads()
   }, [fetchDownloads])
 
-  const handleDownload = useCallback(async (filename: string) => {
-    const url = filename.endsWith(".apk")
-      ? `/api/downloads/apk/get`
-      : `/api/downloads/${encodeURIComponent(filename)}`
-    if (filename.endsWith(".apk")) {
-      try {
-        const res = await fetch(url)
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const blob = await res.blob()
-        const blobUrl = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = blobUrl
-        a.download = "picoclaw.apk"
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000)
-      } catch {
-        window.location.href = url
-      }
-    } else {
-      const a = document.createElement("a")
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+  const handleDownload = useCallback(async (item: DownloadItem) => {
+    if (item.external_url) {
+      window.open(item.external_url, "_blank")
+      return
     }
+    const filename = item.filename!
+    const url = `/api/downloads/${encodeURIComponent(filename)}`
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }, [])
 
   return (
@@ -91,8 +85,7 @@ export function DownloadPage() {
 
       <div className="flex flex-1 flex-col gap-4 overflow-hidden p-4 sm:p-8">
         <p className="text-muted-foreground mb-4 text-sm">
-          Download the modified Taipaies with the Cron Tasks page included.
-          Choose your platform below.
+          Download the latest Taipaies launcher for your platform.
         </p>
 
         {loading ? (
@@ -107,37 +100,27 @@ export function DownloadPage() {
               <Card key={item.filename ?? item.os + item.arch}>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    {item.os === "windows" && "🪟"}
-                    {item.os === "darwin" && "🍎"}
-                    {item.os === "android" && "📱"}
+                    <span>{osIcon(item.os)}</span>
                     {item.label}
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    {item.type === "apk" && "Native APK (core bundled)"}
-                    {item.type === "launcher" && "Web UI Launcher (browser interface)"}
+                    {item.type === "apk" && "Android APK (core bundled)"}
+                    {item.type === "launcher" && "Web UI Launcher"}
                     {item.size > 0 ? ` · ${formatSize(item.size)}` : ""}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {item.external_url ? (
-                    <Button
-                      className="w-full"
-                      variant="default"
-                      onClick={() => window.open(item.external_url, "_blank")}
-                    >
-                      <IconExternalLink className="size-4" />
-                      Download from picoclaw.io
-                    </Button>
-                  ) : (
-                    <Button
-                      className="w-full"
-                      variant="default"
-                      onClick={() => handleDownload(item.filename!)}
-                    >
-                      <IconDownload className="size-4" />
-                      Download
-                    </Button>
-                  )}
+                  <Button
+                    className="w-full"
+                    variant="default"
+                    onClick={() => handleDownload(item)}
+                  >
+                    {item.external_url ? (
+                      <><IconExternalLink className="size-4" /> Download</>
+                    ) : (
+                      <><IconDownload className="size-4" /> Download</>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -148,25 +131,15 @@ export function DownloadPage() {
           <h3 className="mb-2 text-sm font-medium">Installation Notes</h3>
           <ul className="text-muted-foreground list-disc space-y-1 pl-4 text-xs">
             <li>
-              <strong>Windows:</strong> Run{" "}
-              <code className="bg-muted rounded px-1">picoclaw-launcher-windows-amd64.exe</code>,
-              open http://localhost:18800
+              <strong>Windows:</strong> Run the exe file, then open{" "}
+              <code className="bg-muted rounded px-1">http://localhost:18800</code> in your browser
             </li>
             <li>
               <strong>macOS:</strong> Open Terminal, run{" "}
-              <code className="bg-muted rounded px-1">chmod +x picoclaw-launcher-darwin-* &amp;&amp; ./picoclaw-launcher-darwin-*</code>
+              <code className="bg-muted rounded px-1">chmod +x taipaies-launcher-darwin-* &amp;&amp; ./taipaies-launcher-darwin-*</code>
             </li>
             <li>
-              <strong>Android:</strong> Download the official APK from{" "}
-              <a
-                href="https://picoclaw.io/download/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 underline"
-              >
-                picoclaw.io <IconExternalLink className="size-3" />
-              </a>{" "}
-              (core bundled, no Termux needed)
+              <strong>Android:</strong> Download the APK and install it on your device
             </li>
           </ul>
         </div>
