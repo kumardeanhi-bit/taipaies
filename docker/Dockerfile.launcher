@@ -57,8 +57,8 @@ FROM alpine:3.23
 
 RUN apk add --no-cache ca-certificates tzdata curl
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -q --spider http://localhost:18790/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget -q --spider http://localhost:18800/health || exit 1
 
 COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
 COPY --from=builder /src/build/picoclaw-launcher /usr/local/bin/picoclaw-launcher
