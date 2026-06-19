@@ -22,8 +22,8 @@ import (
 
 type OAuthProviderConfig struct {
 	Issuer       string
-	clientID = "redacted"
-	clientSecret = "redacted"
+	clientID     string
+	clientSecret string
 	TokenURL     string // Override token endpoint (Google uses a different URL than issuer)
 	Scopes       string
 	Originator   string
@@ -42,7 +42,6 @@ var (
 func OpenAIOAuthConfig() OAuthProviderConfig {
 	return OAuthProviderConfig{
 		Issuer:     "https://auth.openai.com",
-		clientID = "redacted"
 		Scopes:     "openid profile email offline_access",
 		Originator: "codex_cli_rs",
 		Port:       1455,
@@ -53,15 +52,9 @@ func OpenAIOAuthConfig() OAuthProviderConfig {
 // Client credentials are the same ones used by OpenCode/pi-ai for Cloud Code Assist access.
 func GoogleAntigravityOAuthConfig() OAuthProviderConfig {
 	// These are the same client credentials used by the OpenCode antigravity plugin.
-	clientID = "redacted"
-		"MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlcC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==",
-	)
-	clientSecret = "redacted"
 	return OAuthProviderConfig{
 		Issuer:       "https://accounts.google.com/o/oauth2/v2",
 		TokenURL:     "https://oauth2.googleapis.com/token",
-		clientID = "redacted"
-		clientSecret = "redacted"
 		Scopes:       "https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/cclog https://www.googleapis.com/auth/experimentsandconfigs",
 		Port:         51121,
 	}
@@ -250,7 +243,7 @@ type DeviceCodeInfo struct {
 // Returns the info needed for the user to authenticate in a browser.
 func RequestDeviceCode(cfg OAuthProviderConfig) (*DeviceCodeInfo, error) {
 	reqBody, _ := json.Marshal(map[string]string{
-		"client_id": cfg.clientID = "redacted"
+		"client_id": cfg.clientID
 	})
 
 	resp, err := http.Post(
@@ -341,7 +334,7 @@ func parseFlexibleInt(raw json.RawMessage) (int, error) {
 
 func LoginDeviceCode(cfg OAuthProviderConfig) (*AuthCredential, error) {
 	reqBody, _ := json.Marshal(map[string]string{
-		"client_id": cfg.clientID = "redacted"
+		"client_id": cfg.clientID
 	})
 
 	resp, err := http.Post(
@@ -441,13 +434,13 @@ func RefreshAccessToken(cred *AuthCredential, cfg OAuthProviderConfig) (*AuthCre
 	}
 
 	data := url.Values{
-		"client_id":     {cfg.clientID = "redacted"
+		"client_id":     {cfg.clientID},
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {cred.RefreshToken},
 		"scope":         {"openid profile email"},
 	}
-	if cfg.clientSecret = "redacted"
-		data.Set("client_secret", cfg.clientSecret = "redacted"
+	if cfg.clientSecret != "" {
+		data.Set("client_secret", cfg.clientSecret)
 	}
 
 	tokenURL := cfg.Issuer + "/oauth/token"
@@ -492,10 +485,10 @@ func BuildAuthorizeURL(cfg OAuthProviderConfig, pkce PKCECodes, state, redirectU
 	return buildAuthorizeURL(cfg, pkce, state, redirectURI)
 }
 
-func buildAuthorizeURL(cfg OAuthProviderConfig, pkce PKCECodes, state, redirectURI string) string {
+	func buildAuthorizeURL(cfg OAuthProviderConfig, pkce PKCECodes, state, redirectURI string) string {
 	params := url.Values{
 		"response_type":         {"code"},
-		"client_id":             {cfg.clientID = "redacted"
+		"client_id":             {cfg.clientID},
 		"redirect_uri":          {redirectURI},
 		"scope":                 {cfg.Scopes},
 		"code_challenge":        {pkce.CodeChallenge},
@@ -533,11 +526,11 @@ func ExchangeCodeForTokens(cfg OAuthProviderConfig, code, codeVerifier, redirect
 		"grant_type":    {"authorization_code"},
 		"code":          {code},
 		"redirect_uri":  {redirectURI},
-		"client_id":     {cfg.clientID = "redacted"
+		"client_id":     {cfg.clientID},
 		"code_verifier": {codeVerifier},
 	}
-	if cfg.clientSecret = "redacted"
-		data.Set("client_secret", cfg.clientSecret = "redacted"
+	if cfg.clientSecret != "" {
+		data.Set("client_secret", cfg.clientSecret)
 	}
 
 	tokenURL := cfg.Issuer + "/oauth/token"
