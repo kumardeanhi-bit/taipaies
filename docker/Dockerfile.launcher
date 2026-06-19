@@ -57,6 +57,8 @@ FROM alpine:3.23
 
 RUN apk add --no-cache ca-certificates tzdata curl
 
+EXPOSE 18800
+
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget -q --spider http://localhost:18800/health || exit 1
 

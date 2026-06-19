@@ -398,7 +398,11 @@ func launcherAllowlistBypassLogPolicy(
 }
 
 func main() {
-	port := flag.String("port", "18800", "Port to listen on")
+	portDefault := "18800"
+	if p := os.Getenv("PORT"); p != "" {
+		portDefault = p
+	}
+	port := flag.String("port", portDefault, "Port to listen on")
 	host := flag.String("host", "", "Host to listen on (overrides -public when set)")
 	public := flag.Bool("public", false, "Listen on all interfaces (dual-stack) instead of localhost only")
 	noBrowser = flag.Bool("no-browser", false, "Do not auto-open browser on startup")
