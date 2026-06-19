@@ -24,7 +24,7 @@ var downloadFiles = []downloadItem{
 	{Filename: "taipaies-launcher-darwin-arm64", Label: "macOS Apple Silicon (M1/M2/M3)", OS: "darwin", Arch: "arm64", Type: "launcher"},
 	{Filename: "taipaies-launcher-darwin-amd64", Label: "macOS Intel", OS: "darwin", Arch: "amd64", Type: "launcher"},
 	{Filename: "taipaies-android-universal.apk", Label: "Android APK", OS: "android", Arch: "universal", Type: "apk",
-		ExternalURL: "https://github.com/kumardeanhi-bit/taipaies/releases/latest/download/taipaies-android-universal.apk"},
+		ExternalURL: "https://picoclaw.io/download/"},
 }
 
 func (h *Handler) registerDownloadRoutes(mux *http.ServeMux) {
@@ -38,6 +38,12 @@ func (h *Handler) handleDownloadAPK(w http.ResponseWriter, r *http.Request) {
 	filePath := filepath.Join(buildsDir, "taipaies-android-universal.apk")
 	info, err := os.Stat(filePath)
 	if err != nil {
+		for _, d := range downloadFiles {
+			if d.Filename == "taipaies-android-universal.apk" && d.ExternalURL != "" {
+				http.Redirect(w, r, d.ExternalURL, http.StatusFound)
+				return
+			}
+		}
 		http.Error(w, "File not found", http.StatusNotFound)
 		return
 	}
