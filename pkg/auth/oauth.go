@@ -243,7 +243,7 @@ type DeviceCodeInfo struct {
 // Returns the info needed for the user to authenticate in a browser.
 func RequestDeviceCode(cfg OAuthProviderConfig) (*DeviceCodeInfo, error) {
 	reqBody, _ := json.Marshal(map[string]string{
-		"client_id": cfg.clientID
+		"client_id": cfg.clientID,
 	})
 
 	resp, err := http.Post(
@@ -334,7 +334,7 @@ func parseFlexibleInt(raw json.RawMessage) (int, error) {
 
 func LoginDeviceCode(cfg OAuthProviderConfig) (*AuthCredential, error) {
 	reqBody, _ := json.Marshal(map[string]string{
-		"client_id": cfg.clientID
+		"client_id": cfg.clientID,
 	})
 
 	resp, err := http.Post(
