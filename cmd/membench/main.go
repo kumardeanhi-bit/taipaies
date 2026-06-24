@@ -333,6 +333,15 @@ func envOrFlag(flag, envKey string) string {
 //	MEMBENCH_API_BASE  – OpenAI-compatible base URL  (default http://127.0.0.1:8080/v1)
 //	MEMBENCH_API_KEY   – Bearer token for the endpoint
 //	MEMBENCH_MODEL     – Model name to send in the request
+//	                     (default: "DeepSeek V4 Flash" for OpenCode Zen)
+//
+// Supported OpenCode Zen models (https://opencode.ai):
+//
+//	"DeepSeek V4 Flash"   – fast, cost-effective DeepSeek model
+//	"DeepSeek V4 Pro"     – higher-capability DeepSeek model
+//	"Claude Sonnet 4.5"   – Anthropic Claude Sonnet
+//	"GPT 5.4"             – OpenAI GPT
+//	"Gemini 3.5 Flash"    – Google Gemini Flash
 func buildLLMOptions() (LLMClientOptions, error) {
 	base := envOrFlag(flagAPIBase, "MEMBENCH_API_BASE")
 	if base == "" {
@@ -340,9 +349,10 @@ func buildLLMOptions() (LLMClientOptions, error) {
 	}
 	model := envOrFlag(flagModel, "MEMBENCH_MODEL")
 	if model == "" {
-		return LLMClientOptions{}, fmt.Errorf(
-			"--model or MEMBENCH_MODEL is required for LLM eval mode",
-		)
+		// Default to a known-good OpenCode Zen model. The previously used
+		// "deepseek-v4-flash-free" name is not supported by the provider
+		// and returns a 401 ModelError. Use the correct display name instead.
+		model = "DeepSeek V4 Flash"
 	}
 	apiKey := envOrFlag(flagAPIKey, "MEMBENCH_API_KEY")
 
