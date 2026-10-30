@@ -3,7 +3,7 @@ module github.com/sipeed/picoclaw
 go 1.25.11
 
 require (
-	fyne.io/systray v1.12.1
+	fyne.io/systray v1.12.2
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
 	github.com/SevereCloud/vksdk/v3 v3.3.1
